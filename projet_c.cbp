@@ -30,7 +30,18 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="C:/SDL2-2.0.14/x86_64-w64-mingw32/include" />
+			<Add directory="C:/SDL2_mixer-2.0.4/x86_64-w64-mingw32/include" />
 		</Compiler>
+		<Linker>
+			<Add library="C:/TDM-GCC-64/x86_64-w64-mingw32/lib/libmingw32.a" />
+			<Add library="C:/SDL2-2.0.14/x86_64-w64-mingw32/lib/libSDL2main.a" />
+			<Add library="C:/SDL2-2.0.14/x86_64-w64-mingw32/lib/libSDL2.dll.a" />
+			<Add library="C:/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib/libSDL2_mixer.a" />
+			<Add library="C:/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib/libSDL2_mixer.dll.a" />
+			<Add directory="C:/SDL2-2.0.14/x86_64-w64-mingw32/lib" />
+			<Add directory="C:/SDL2_mixer-2.0.4/x86_64-w64-mingw32/lib" />
+		</Linker>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
