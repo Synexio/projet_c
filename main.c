@@ -16,6 +16,21 @@ typedef struct Point
     int y;
 }Point;
 
+typedef struct Player
+{
+    int lives;
+    int isShooting;
+    int x;
+    int y;
+}Player;
+
+typedef struct Bullet
+{
+    int speed;
+    int x;
+    int y;
+}Bullet;
+
 Point pollclick(){
     SDL_Event event;
     Point p;
@@ -35,8 +50,8 @@ int pollpress(){
 
     while(SDL_PollEvent(&event)){
         if(event.type == SDL_KEYDOWN){
-            if(event.key.keysym.sym == SDLK_UP)
-                printf("UP ");
+            return event.key.keysym.sym;
+
         }
     }
 }
@@ -79,9 +94,9 @@ void drawImage(SDL_Window *window, SDL_Surface *image, SDL_Renderer *renderer, i
     }
 
     //Affiche le rendu
-    SDL_RenderPresent(renderer);
+    //SDL_RenderPresent(renderer);
 
-
+    //printf("Image affichee");
 
 }
 
@@ -96,7 +111,9 @@ int main(int argc, char** argv)
 
     FMOD_SYSTEM *system;
     FMOD_SOUND *bgmusic = NULL;
-    FMOD_CHANNEL *channel;
+    FMOD_SOUND *theme = NULL;
+    FMOD_CHANNEL *channel0;
+    FMOD_CHANNEL *channel1;
 
 
     //Mix_Music *musicbg = NULL;
@@ -110,9 +127,11 @@ int main(int argc, char** argv)
 
     FMOD_System_Create(&system);
     FMOD_System_Init(system, 10, FMOD_INIT_NORMAL  , NULL);
-    FMOD_System_GetChannel(system,0,&channel);
+    FMOD_System_GetChannel(system,0,&channel0);
+    FMOD_System_GetChannel(system,1,&channel1);
     FMOD_System_CreateSound(system, "ressources/sg_gos.mp3", FMOD_CREATESAMPLE, 0, &bgmusic);
-    FMOD_System_PlaySound(system, bgmusic, 0, 0, &channel);
+    FMOD_System_CreateSound(system, "ressources/main_theme.mp3", FMOD_CREATESAMPLE, 0, &theme);
+    FMOD_System_PlaySound(system, bgmusic, 0, 0, &channel0);
 
     //Creation fenetre et verif
     window = SDL_CreateWindow("Touhou 0.1 by AH & JF",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,WINDOW_WIDTH,WINDOW_HEIGHT,0);
@@ -131,6 +150,7 @@ int main(int argc, char** argv)
 //Execution du programme
     SDL_bool program_launched = SDL_TRUE;
     SDL_bool game = SDL_FALSE;
+    SDL_Surface *reimu = NULL;
     int menu = 0;
 
     while(program_launched){
@@ -138,16 +158,21 @@ int main(int argc, char** argv)
         Point click;
         int buttonpress = 0;
 
-        while(SDL_PollEvent(&event)){
-            if (event.type == SDL_QUIT){
-                program_launched = SDL_FALSE;
-            }
-        }
+
 
         if(menu==0){
 
+            while(SDL_PollEvent(&event)){
+                if (event.type == SDL_QUIT){
+                    program_launched = SDL_FALSE;
+                    printf("QUIT\n");
+                    break;
+                }
+            }
+
             imagebg = SDL_LoadBMP("ressources/ckdo.bmp");
             drawImage(window,imagebg,renderer,0,0);
+            SDL_RenderPresent(renderer);
             click = pollclick();
             buttonpress = pollpress();
 
@@ -156,11 +181,54 @@ int main(int argc, char** argv)
                 menu = 1;
             }
 
+            if( ( click.x > 275 ) && ( click.x < 530 ) && ( click.y > 475 ) && ( click.y < 555 ) ){
+                program_launched = SDL_FALSE;
+            }
+
+
+
         }
 
         if(menu==1){
-            imagebg = SDL_LoadBMP("ressources/bg1.bmp");
-            drawImage(window,imagebg,renderer,0,0);
+
+            FMOD_Channel_SetPaused(channel0,1);
+            FMOD_System_PlaySound(system, theme, 0, 0, &channel1);
+
+            int reimu_x = 390;
+            int reimu_y = 552;
+
+            while(program_launched)
+            {
+
+                imagebg = SDL_LoadBMP("ressources/ckdo2.bmp");
+                reimu = SDL_LoadBMP("ressources/reimu.bmp");
+
+                while(SDL_PollEvent(&event)){
+                    if (event.type == SDL_KEYDOWN){
+                        if(event.key.keysym.sym == SDLK_LEFT && reimu_x >=10){
+                            printf("%d\n",reimu_x);
+                            reimu_x-=10;
+                        }
+                        if(event.key.keysym.sym == SDLK_RIGHT && reimu_x <=750){
+                            printf("RIGHT\n");
+                            reimu_x+=10;
+                        }
+                    }
+                    if (event.type == SDL_QUIT){
+                        program_launched = SDL_FALSE;
+                        printf("QUIT\n");
+                        break;
+                    }
+                }
+
+                drawImage(window,imagebg,renderer,0,0);
+                drawImage(window,reimu,renderer,reimu_x,reimu_y);
+                SDL_RenderPresent(renderer);
+
+
+
+
+            }
         }
 
 
