@@ -1,8 +1,9 @@
 # depslib dependency file v1.0
-1613850552 source:c:\users\alexh\onedrive\bureau\esgi\2eme annee\1er semestre\langage c avancé\projet_c\main.c
+1614197571 source:c:\users\alexh\onedrive\bureau\esgi\2eme annee\1er semestre\langage c avancé\projet_c\main.c
 	<stdio.h>
 	<stdlib.h>
 	<SDL2/SDL.h>
+	<fmod.h>
 
 1608572791 c:\sdl2-2.0.14\i686-w64-mingw32\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -741,4 +742,21 @@
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod.h
+	"fmod_common.h"
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod_common.h
+	"fmod_codec.h"
+	"fmod_dsp.h"
+	"fmod_output.h"
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod_codec.h
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod_dsp.h
+	"fmod_dsp_effects.h"
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod_dsp_effects.h
+
+1612961312 c:\program files (x86)\fmod soundsystem\fmod studio api windows\api\core\inc\fmod_output.h
 

@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 //#include <SDL2/SDL_mixer.h>
 
+#include <fmod.h>
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 void SDL_ExitWithError(char* message);
@@ -17,6 +19,11 @@ int main(int argc, char** argv)
     SDL_Surface *imagebg = NULL;
     SDL_Texture *texturebg = NULL;
 
+    FMOD_SYSTEM *system;
+    FMOD_SOUND *bgmusic = NULL;
+    FMOD_CHANNEL *channel;
+
+
     //Mix_Music *musicbg = NULL;
 
     //Initialisation SDL et vérif
@@ -24,22 +31,13 @@ int main(int argc, char** argv)
         SDL_ExitWithError("Initialisation SDL");
     }
 
-    //Init audio et vérif
-    /*if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
-    {
-        SDL_Log("Erreur initialisation SDL_mixer : %s", Mix_GetError());
-        SDL_Quit();
-        exit(EXIT_FAILURE);
-    }
+    //Init audio
 
-    music = Mix_LoadMUS("ressources/sg_gos.mp3");
-    if (music == nullptr)
-    {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Erreur chargement de la musique : %s", Mix_GetError());
-        Mix_CloseAudio();
-        SDL_Quit();
-        exit(EXIT_FAILURE);
-    }*/
+    FMOD_System_Create(&system);
+    FMOD_System_Init(system, 10, FMOD_INIT_NORMAL  , NULL);
+    FMOD_System_GetChannel(system,0,&channel);
+    FMOD_System_CreateSound(system, "ressources/sg_gos.mp3", FMOD_CREATESAMPLE, 0, &bgmusic);
+    FMOD_System_PlaySound(system, bgmusic, 0, 0, &channel);
 
     //Creation fenetre et verif
     window = SDL_CreateWindow("Touhou 0.1 by AH & JF",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,WINDOW_WIDTH,WINDOW_HEIGHT,0);
@@ -154,7 +152,7 @@ int main(int argc, char** argv)
 
     /*-------------------------------------------------------------------------*/
     //Quitter SDL
-    //Mix_CloseAudio();
+    FMOD_System_Release(system);
     SDL_DestroyTexture(texturebg);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
