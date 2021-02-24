@@ -10,6 +10,81 @@
 #define WINDOW_HEIGHT 600
 void SDL_ExitWithError(char* message);
 
+typedef struct Point
+{
+    int x;
+    int y;
+}Point;
+
+Point pollclick(){
+    SDL_Event event;
+    Point p;
+
+    while(SDL_PollEvent(&event)){
+        if(event.type == SDL_MOUSEBUTTONDOWN){
+            p.x = event.motion.x;
+            p.y = event.motion.y;
+        }
+    }
+
+    return p;
+}
+
+int pollpress(){
+    SDL_Event event;
+
+    while(SDL_PollEvent(&event)){
+        if(event.type == SDL_KEYDOWN){
+            if(event.key.keysym.sym == SDLK_UP)
+                printf("UP ");
+        }
+    }
+}
+
+void drawImage(SDL_Window *window, SDL_Surface *image, SDL_Renderer *renderer, int x, int y){
+
+    SDL_Texture *texture;
+    SDL_Rect rectangle;
+
+    if (image == NULL){
+
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Creation image");
+    }
+
+    texture = SDL_CreateTextureFromSurface(renderer,image);
+    SDL_FreeSurface(image);
+    if (texture == NULL){
+
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Creation texture");
+    }
+
+
+    if (SDL_QueryTexture(texture,NULL,NULL,&rectangle.w,&rectangle.h) != 0){
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Chargement texture");
+    }
+
+    rectangle.x = x;
+    rectangle.y = y;
+
+    if (SDL_RenderCopy(renderer,texture,NULL,&rectangle) != 0){
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_ExitWithError("Affichage texture");
+    }
+
+    //Affiche le rendu
+    SDL_RenderPresent(renderer);
+
+
+
+}
+
 int main(int argc, char** argv)
 {
 
@@ -17,7 +92,7 @@ int main(int argc, char** argv)
     SDL_Renderer *renderer = NULL;
 
     SDL_Surface *imagebg = NULL;
-    SDL_Texture *texturebg = NULL;
+    //SDL_Texture *texturebg = NULL;
 
     FMOD_SYSTEM *system;
     FMOD_SOUND *bgmusic = NULL;
@@ -55,51 +130,41 @@ int main(int argc, char** argv)
 
 //Execution du programme
     SDL_bool program_launched = SDL_TRUE;
+    SDL_bool game = SDL_FALSE;
+    int menu = 0;
 
     while(program_launched){
         SDL_Event event;
+        Point click;
+        int buttonpress = 0;
 
         while(SDL_PollEvent(&event)){
-            switch(event.type){
-                case SDL_MOUSEMOTION:
-                    printf("%d / %d \n",event.motion.x,event.motion.y);
-                    break;
-                case SDL_KEYDOWN:
-                    switch(event.key.keysym.sym){
-                        case SDLK_UP:
-                            printf("UP");
-                            break;
-
-                        default:
-                            break;
-
-                    }
-                    break;
-                case SDL_KEYUP:
-                    switch(event.key.keysym.sym){
-                        case SDLK_UP:
-                            printf("UP");
-                            break;
-
-                        default:
-                            break;
-
-                    }
-                    break;
-                case SDL_QUIT:
-                    program_launched = SDL_FALSE;
-                    break;
-                default:
-                    break;
+            if (event.type == SDL_QUIT){
+                program_launched = SDL_FALSE;
             }
         }
 
+        if(menu==0){
+
+            imagebg = SDL_LoadBMP("ressources/ckdo.bmp");
+            drawImage(window,imagebg,renderer,0,0);
+            click = pollclick();
+            buttonpress = pollpress();
+
+            if( ( click.x > 275 ) && ( click.x < 530 ) && ( click.y > 225 ) && ( click.y < 310 ) ){
+                printf("\nIN\n");
+                menu = 1;
+            }
+
+        }
+
+        if(menu==1){
+            imagebg = SDL_LoadBMP("ressources/bg1.bmp");
+            drawImage(window,imagebg,renderer,0,0);
+        }
 
 
-
-
-
-
+    /*
     imagebg = SDL_LoadBMP("ressources/ckdo.bmp");
     if (imagebg == NULL){
 
@@ -124,8 +189,8 @@ int main(int argc, char** argv)
         SDL_ExitWithError("Chargement texture");
     }
 
-    rectangle.x = (WINDOW_WIDTH-rectangle.w)/2;
-    rectangle.y = (WINDOW_HEIGHT-rectangle.h)/2;
+    rectangle.x = 0;
+    rectangle.y = 0;
 
     if (SDL_RenderCopy(renderer,texturebg,NULL,&rectangle) != 0){
         SDL_DestroyRenderer(renderer);
@@ -136,7 +201,7 @@ int main(int argc, char** argv)
     //Affiche le rendu
     SDL_RenderPresent(renderer);
 
-    /*
+
     //Efface le rendu
     if(SDL_RenderClear(renderer) != 0){
         SDL_ExitWithError("Effacement rendu");
@@ -153,7 +218,6 @@ int main(int argc, char** argv)
     /*-------------------------------------------------------------------------*/
     //Quitter SDL
     FMOD_System_Release(system);
-    SDL_DestroyTexture(texturebg);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
